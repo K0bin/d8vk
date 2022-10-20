@@ -3,7 +3,6 @@
 // Implements IDirect3DVertexBuffer8 and IDirect3DIndexBuffer8
 
 #include "d3d8_include.h"
-#include "d3d8_resource.h"
 
 namespace dxvk {
 
