@@ -11,6 +11,8 @@
 
 namespace dxvk {
 
+  class D3D9InterfaceEx;
+
   /**
   * \brief D3D8 interface implementation
   *
@@ -18,8 +20,83 @@ namespace dxvk {
   * which provides the way to get adapters and create other objects such as \ref d3d8::IDirect3DDevice8.
   * similar to \ref DxgiFactory but for D3D8.
   */
-  class D3D8InterfaceEx final : public ComObjectClamp<IDirect3D8> {
+  class D3D8Interface final : public d3d8::IDirect3D8 {
 
+  public:
+    D3D8Interface(D3D9InterfaceEx* pParent);
+
+    // IUnknown methods //
+    HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject);
+
+    ULONG STDMETHODCALLTYPE AddRef();
+
+    ULONG STDMETHODCALLTYPE Release();
+
+    // IDirect3D8 methods //
+
+    HRESULT STDMETHODCALLTYPE RegisterSoftwareDevice(void* pInitializeFunction);
+
+    UINT STDMETHODCALLTYPE GetAdapterCount();
+
+    HRESULT STDMETHODCALLTYPE GetAdapterIdentifier(
+      UINT                    Adapter,
+      DWORD                   Flags,
+      d3d8::D3DADAPTER_IDENTIFIER8* pIdentifier);
+
+    UINT STDMETHODCALLTYPE GetAdapterModeCount(UINT Adapter);
+
+    HRESULT STDMETHODCALLTYPE EnumAdapterModes(
+      UINT            Adapter,
+      UINT            Mode,
+      d3d8::D3DDISPLAYMODE* pMode);
+
+    HRESULT STDMETHODCALLTYPE GetAdapterDisplayMode(UINT Adapter, d3d8::D3DDISPLAYMODE* pMode);
+
+    HRESULT STDMETHODCALLTYPE CheckDeviceType(
+        UINT        Adapter,
+        d3d8::D3DDEVTYPE  DevType,
+        d3d8::D3DFORMAT   AdapterFormat,
+        d3d8::D3DFORMAT   BackBufferFormat,
+        BOOL        bWindowed);
+
+    HRESULT STDMETHODCALLTYPE CheckDeviceFormat(
+        UINT            Adapter,
+        d3d8::D3DDEVTYPE      DeviceType,
+        d3d8::D3DFORMAT       AdapterFormat,
+        DWORD           Usage,
+        d3d8::D3DRESOURCETYPE RType,
+        d3d8::D3DFORMAT       CheckFormat);
+
+    HRESULT STDMETHODCALLTYPE CheckDeviceMultiSampleType(
+        UINT                Adapter,
+        d3d8::D3DDEVTYPE          DeviceType,
+        d3d8::D3DFORMAT           SurfaceFormat,
+        BOOL                Windowed,
+        d3d8::D3DMULTISAMPLE_TYPE MultiSampleType);
+
+    HRESULT STDMETHODCALLTYPE CheckDepthStencilMatch(
+        UINT Adapter,
+        d3d8::D3DDEVTYPE DeviceType,
+        d3d8::D3DFORMAT AdapterFormat,
+        d3d8::D3DFORMAT RenderTargetFormat,
+        d3d8::D3DFORMAT DepthStencilFormat);
+
+    HRESULT STDMETHODCALLTYPE GetDeviceCaps(
+        UINT Adapter,
+        d3d8::D3DDEVTYPE DeviceType,
+        d3d8::D3DCAPS8* pCaps);
+
+    HMONITOR STDMETHODCALLTYPE GetAdapterMonitor(UINT Adapter);
+
+    HRESULT STDMETHODCALLTYPE CreateDevice(
+        UINT Adapter,
+        d3d8::D3DDEVTYPE DeviceType,
+        HWND hFocusWindow,
+        DWORD BehaviorFlags,
+        d3d8::D3DPRESENT_PARAMETERS* pPresentationParameters,
+        d3d8::IDirect3DDevice8** ppReturnedDeviceInterface);
+
+  private:
     static constexpr D3DFORMAT ADAPTER_FORMATS[] = {
       D3DFMT_A1R5G5B5,
       //D3DFMT_A2R10G10B10, (not in D3D8)
@@ -29,157 +106,9 @@ namespace dxvk {
       D3DFMT_X8R8G8B8
     };
 
-  public:
-    D3D8InterfaceEx(UINT SDKVersion);
+    std::vector<std::vector<d3d8::D3DDISPLAYMODE>> m_adapterModes;
 
-    // IUnknown methods //
-    HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject);
-
-    // IDirect3D8 methods //
-
-    // TODO: RegisterSoftwareDevice //
-    HRESULT STDMETHODCALLTYPE RegisterSoftwareDevice(void* pInitializeFunction) {
-      dxvk::Logger::warn("D3D8InterfaceEx::RegisterSoftwareDevice: stub");
-      return D3DERR_INVALIDCALL;
-    }
-
-    UINT STDMETHODCALLTYPE GetAdapterCount() {
-      return m_d3d9ex->GetAdapterCount();
-    }
-
-    HRESULT STDMETHODCALLTYPE GetAdapterIdentifier(
-      UINT                    Adapter,
-      DWORD                   Flags,
-      D3DADAPTER_IDENTIFIER8* pIdentifier);
-
-    UINT STDMETHODCALLTYPE GetAdapterModeCount(UINT Adapter) {
-      return m_adapterModeCounts[Adapter];
-    }
-
-    HRESULT STDMETHODCALLTYPE EnumAdapterModes(
-      UINT            Adapter,
-      UINT            Mode,
-      D3DDISPLAYMODE* pMode);
-
-    HRESULT STDMETHODCALLTYPE GetAdapterDisplayMode(UINT Adapter, D3DDISPLAYMODE* pMode) {
-      return m_d3d9ex->GetAdapterDisplayMode(Adapter, (D3DDISPLAYMODE*)pMode);
-    }
-
-    HRESULT STDMETHODCALLTYPE CheckDeviceType(
-        UINT        Adapter,
-        D3DDEVTYPE  DevType,
-        D3DFORMAT   AdapterFormat,
-        D3DFORMAT   BackBufferFormat,
-        BOOL        bWindowed) {
-      return m_d3d9ex->CheckDeviceType(
-          Adapter,
-          (D3DDEVTYPE)DevType,
-          (D3DFORMAT)AdapterFormat,
-          (D3DFORMAT)BackBufferFormat,
-          bWindowed
-      );
-    }
-
-    HRESULT STDMETHODCALLTYPE CheckDeviceFormat(
-        UINT            Adapter,
-        D3DDEVTYPE      DeviceType,
-        D3DFORMAT       AdapterFormat,
-        DWORD           Usage,
-        D3DRESOURCETYPE RType,
-        D3DFORMAT       CheckFormat) {
-      // HACK: forceD16.
-      if (m_d3d8Options.forceD16 && (Usage & D3DUSAGE_DEPTHSTENCIL)) {
-        // Some other less common depth formats are not checked here.
-        if (CheckFormat == D3DFMT_D32 || CheckFormat == D3DFMT_D24S8)
-          return D3DERR_NOTAVAILABLE;
-      }
-
-      return m_d3d9ex->CheckDeviceFormat(
-        Adapter,
-        (D3DDEVTYPE)DeviceType,
-        (D3DFORMAT)AdapterFormat,
-        Usage,
-        (D3DRESOURCETYPE)RType,
-        (D3DFORMAT)CheckFormat
-      );
-    }
-
-    HRESULT STDMETHODCALLTYPE CheckDeviceMultiSampleType(
-        UINT                Adapter,
-        D3DDEVTYPE          DeviceType,
-        D3DFORMAT           SurfaceFormat,
-        BOOL                Windowed,
-        D3DMULTISAMPLE_TYPE MultiSampleType) {
-
-      DWORD* pQualityLevels = nullptr;
-      return m_d3d9ex->CheckDeviceMultiSampleType(
-        Adapter,
-        (D3DDEVTYPE)DeviceType,
-        (D3DFORMAT)SurfaceFormat,
-        Windowed,
-        (D3DMULTISAMPLE_TYPE)MultiSampleType,
-        pQualityLevels
-      );
-    }
-
-    HRESULT STDMETHODCALLTYPE CheckDepthStencilMatch(
-        UINT Adapter,
-        D3DDEVTYPE DeviceType,
-        D3DFORMAT AdapterFormat,
-        D3DFORMAT RenderTargetFormat,
-        D3DFORMAT DepthStencilFormat) {
-      return m_d3d9ex->CheckDepthStencilMatch(
-        Adapter,
-        (D3DDEVTYPE)DeviceType,
-        (D3DFORMAT)AdapterFormat,
-        (D3DFORMAT)RenderTargetFormat,
-        (D3DFORMAT)DepthStencilFormat
-      );
-    }
-
-    HRESULT STDMETHODCALLTYPE GetDeviceCaps(
-        UINT Adapter,
-        D3DDEVTYPE DeviceType,
-        D3DCAPS8* pCaps) {
-      D3DCAPS9 caps9;
-      HRESULT res = m_d3d9ex->GetDeviceCaps(Adapter, (D3DDEVTYPE)DeviceType, &caps9);
-      dxvk::ConvertCaps8(caps9, pCaps);
-      return res;
-    }
-
-    HMONITOR STDMETHODCALLTYPE GetAdapterMonitor(UINT Adapter) {
-      return m_d3d9ex->GetAdapterMonitor(Adapter);
-    }
-
-    HRESULT STDMETHODCALLTYPE CreateDevice(
-        UINT Adapter,
-        D3DDEVTYPE DeviceType,
-        HWND hFocusWindow,
-        DWORD BehaviorFlags,
-        D3DPRESENT_PARAMETERS* pPresentationParameters,
-        d3d8::IDirect3DDevice8** ppReturnedDeviceInterface);
-
-
-    //Rc<DxvkInstance> GetInstance() { return m_instance; }
-
-  private:
-
-    UINT m_adapterCount;
-    std::vector<UINT> m_adapterModeCounts;
-    std::vector<std::vector<D3DDISPLAYMODE>> m_adapterModes;
-
-    //void CacheModes(D3D9Format Format);
-
-    //static const char* GetDriverDllName(DxvkGpuVendor vendor);
-
-    IDirect3D9Ex* m_d3d9ex;
-
-    bool m_extended;
-
-    D3D9InterfaceBridge*  m_bridge;
-    D3D8Options           m_d3d8Options;
-
-    //std::vector<D3D9Adapter> m_adapters;
+    D3D9InterfaceEx* m_d3d9;
   };
 
 } // namespace dxvk

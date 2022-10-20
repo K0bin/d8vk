@@ -6,6 +6,8 @@
 
 #include "../dxvk/dxvk_instance.h"
 
+#include "../d3d8/d3d8_interface.h"
+
 namespace dxvk {
 
   /**
@@ -131,6 +133,10 @@ namespace dxvk {
 
     Rc<DxvkInstance> GetInstance() { return m_instance; }
 
+    D3D8Interface* GetD3D8Iface() {
+      return &m_d3d8;
+    }
+
   private:
 
     void CacheModes(D3D9Format Format);
@@ -148,6 +154,8 @@ namespace dxvk {
     std::vector<D3D9Adapter>      m_adapters;
 
     D3D9VkInteropInterface        m_d3d9Interop;
+
+    D3D8Interface                 m_d3d8;
 
   };
 

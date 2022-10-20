@@ -14,7 +14,8 @@ namespace dxvk {
     , m_bridge      ( this )
     , m_extended    ( bExtended ) 
     , m_d3d9Options ( nullptr, m_instance->config() )
-    , m_d3d9Interop ( this ) {
+    , m_d3d9Interop ( this )
+    , m_d3d8        ( this ) {
     // D3D9 doesn't enumerate adapters like physical adapters...
     // only as connected displays.
 

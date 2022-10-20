@@ -39,7 +39,7 @@
 
 namespace dxvk {
 
-  class D3D8InterfaceEx;
+  class D3D8Interface;
   class D3D8SwapChainEx;
   class D3D9DeviceEx;
 
@@ -52,7 +52,7 @@ namespace dxvk {
   public:
 
     D3D8Device(
-      D3D8InterfaceEx*              pParent,
+      D3D8Interface*              pParent,
       Com<IDirect3DDevice9>&& pDevice,
       //D3D8Adapter*                    pAdapter,
       D3DDEVTYPE                    DeviceType,
@@ -397,7 +397,7 @@ namespace dxvk {
 
     D3D9DeviceEx*         m_d3d9;
 
-    Com<D3D8InterfaceEx>  m_parent;
+    Com<D3D8Interface>  m_parent;
 
     std::array<d3d8::IDirect3DBaseTexture8*, d8caps::MAX_TEXTURE_STAGES>  m_textures;
 

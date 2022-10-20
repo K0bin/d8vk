@@ -13,7 +13,8 @@ d3d8_src = [
   '../d3d8/d3d8_texture.cpp',
   '../d3d8/d3d8_surface.cpp',
   '../d3d8/d3d8_volume.cpp',
-  '../d3d8/d3d8_buffer.cpp'
+  '../d3d8/d3d8_buffer.cpp',
+  '../d3d8/d3d8_interface.cpp'
   # '../d3d8/d3d8_device.cpp',
 ]
 
