@@ -1,219 +1,208 @@
 #pragma once
 
-#include "d3d8_device.h"
-
-#include "d3d8_resource.h"
-#include "d3d8_surface.h"
-
-#include "d3d8_d3d9_util.h"
-
-#include <vector>
-#include <list>
-#include <mutex>
-#include <new>
-#include <type_traits>
+#include "d3d8_include.h"
 
 namespace dxvk {
 
-   /**
-   * \brief Common texture description
-   * 
-   * Contains all members that can be
-   * defined for 2D, Cube and 3D textures.
-   */
-  struct D3D8_COMMON_TEXTURE_DESC {
-    UINT                Width;
-    UINT                Height;
-    UINT                Depth;
-    UINT                ArraySize;
-    UINT                MipLevels;
-    DWORD               Usage;
-    D3DFORMAT           Format; // TODO: D3D8Format
-    D3DPOOL             Pool;
-    BOOL                Discard;
-    D3DMULTISAMPLE_TYPE MultiSample;
-  };
+  class D3D9Texture2D;
+  class D3D9TextureCube;
+  class D3D9Surface;
+  class D3D9Texture3D;
+  class D3D9Volume;
 
-
-  // Implements IDirect3DBaseTexture8 (Except GetType)
-  template <typename SubresourceType, typename D3D9, typename D3D8>
-  class D3D8BaseTexture : public D3D8Resource<D3D9, D3D8> {
+  class D3D8Texture2D final : public d3d8::IDirect3DTexture8 {
 
   public:
 
-    using SubresourceData = std::aligned_storage_t<sizeof(SubresourceType), alignof(SubresourceType)>;
-
-    D3D8BaseTexture(
-            D3D8DeviceEx*                       pDevice,
-            Com<D3D9>&&                         pBaseTexture,
-      //const D3D8_COMMON_TEXTURE_DESC*         pDesc,
-            D3DRESOURCETYPE                     ResourceType)
-        : D3D8Resource<D3D9, D3D8> ( pDevice, std::move(pBaseTexture) ) {
-      // TODO: set up subresource
-    }
-
-    ~D3D8BaseTexture() {
-    }
-
-    // TODO: all these methods should probably be final
-
-    void STDMETHODCALLTYPE PreLoad() {
-      this->GetD3D9()->PreLoad();
-    }
-
-    DWORD STDMETHODCALLTYPE SetLOD(DWORD LODNew) {
-      return this->GetD3D9()->SetLOD(LODNew);
-    }
-
-    DWORD STDMETHODCALLTYPE GetLOD() {
-      return this->GetD3D9()->GetLOD();
-    }
-
-    DWORD STDMETHODCALLTYPE GetLevelCount() {
-      return this->GetD3D9()->GetLevelCount();
-    }
-
-    SubresourceType* GetSubresource(UINT Subresource) {
-      return reinterpret_cast<SubresourceType*>(&m_subresources[Subresource]);
-    }
-
-  protected:
-
-    std::vector<SubresourceData> m_subresources;
-
-  };
-
-  // Implements IDirect3DTexture8 //
-
-  using D3D8Texture2DBase = D3D8BaseTexture<D3D8Surface, d3d9::IDirect3DTexture9, IDirect3DTexture8>;
-  class D3D8Texture2D final : public D3D8Texture2DBase {
-
-  public:
-
-    D3D8Texture2D(
-            D3D8DeviceEx*                  pDevice,
-            Com<d3d9::IDirect3DTexture9>&& pTexture)
-      : D3D8Texture2DBase(pDevice, std::move(pTexture), D3DRTYPE_TEXTURE) {
-    }
-
-    // TODO: QueryInterface
-    HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject) {
-      return D3D_OK;
-    }
-
-    D3DRESOURCETYPE STDMETHODCALLTYPE GetType() { return D3DRTYPE_TEXTURE; }
-
-    HRESULT STDMETHODCALLTYPE GetLevelDesc(UINT Level, D3DSURFACE_DESC* pDesc) {
-      d3d9::D3DSURFACE_DESC surf;
-      HRESULT res = GetD3D9()->GetLevelDesc(Level, &surf);
-      ConvertSurfaceDesc8(&surf, pDesc);
-      return res;
-    }
-
-    HRESULT STDMETHODCALLTYPE GetSurfaceLevel(UINT Level, IDirect3DSurface8** ppSurfaceLevel) {
-      // TODO: cache this
-      Com<d3d9::IDirect3DSurface9> surface = nullptr;
-      HRESULT res = GetD3D9()->GetSurfaceLevel(Level, &surface);
-      *ppSurfaceLevel = ref(new D3D8Surface(m_parent, std::move(surface)));
-      return res;
-    }
-
-    HRESULT STDMETHODCALLTYPE LockRect(UINT Level, D3DLOCKED_RECT* pLockedRect, CONST RECT* pRect, DWORD Flags) {
-      return GetD3D9()->LockRect(Level, reinterpret_cast<d3d9::D3DLOCKED_RECT*>(pLockedRect), pRect, Flags);
-    }
-
-    HRESULT STDMETHODCALLTYPE UnlockRect(UINT Level) {
-      return GetD3D9()->UnlockRect(Level);
-    }
-
-    HRESULT STDMETHODCALLTYPE AddDirtyRect(CONST RECT* pDirtyRect) {
-      return GetD3D9()->AddDirtyRect(pDirtyRect);
-    }
-
-  };
-
-/*
-  using D3D8Texture3DBase = D3D8BaseTexture<D3D8Volume, IDirect3DVolumeTexture8>;
-  class D3D8Texture3D final : public D3D8Texture3DBase {
-
-  public:
-
-    D3D8Texture3D(
-            D3D8DeviceEx*             pDevice,
-      const D3D8_COMMON_TEXTURE_DESC* pDesc);
+    D3D8Texture2D(D3D9Texture2D* pParent)
+      : m_d3d9(pParent) { }
 
     HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject);
 
-    D3DRESOURCETYPE STDMETHODCALLTYPE GetType();
+    d3d8::D3DRESOURCETYPE STDMETHODCALLTYPE GetType();
 
-    HRESULT STDMETHODCALLTYPE GetLevelDesc(UINT Level, D3DVOLUME_DESC *pDesc);
+    ULONG STDMETHODCALLTYPE AddRef();
 
-    HRESULT STDMETHODCALLTYPE GetVolumeLevel(UINT Level, IDirect3DVolume8** ppSurfaceLevel);
+    ULONG STDMETHODCALLTYPE Release();
 
-    HRESULT STDMETHODCALLTYPE LockBox(UINT Level, D3DLOCKED_BOX* pLockedBox, CONST D3DBOX* pBox, DWORD Flags);
+    HRESULT STDMETHODCALLTYPE GetPrivateData(
+            REFGUID     refguid,
+            void*       pData,
+            DWORD*      pSizeOfData);
 
-    HRESULT STDMETHODCALLTYPE UnlockBox(UINT Level);
+    HRESULT STDMETHODCALLTYPE SetPrivateData(
+            REFGUID     refguid,
+      const void*       pData,
+            DWORD       pSizeOfData,
+            DWORD       Flags);
 
-    HRESULT STDMETHODCALLTYPE AddDirtyBox(CONST D3DBOX* pDirtyBox);
+    HRESULT STDMETHODCALLTYPE FreePrivateData(REFGUID refguid);
+
+    HRESULT STDMETHODCALLTYPE GetDevice(d3d8::IDirect3DDevice8** ppDevice);
+
+    DWORD STDMETHODCALLTYPE GetPriority();
+
+    void STDMETHODCALLTYPE PreLoad();
+
+    DWORD STDMETHODCALLTYPE SetPriority(DWORD PriorityNew);
+
+    HRESULT STDMETHODCALLTYPE GetLevelDesc(UINT Level, d3d8::D3DSURFACE_DESC* pDesc);
+
+    DWORD STDMETHODCALLTYPE SetLOD(DWORD LodNew);
+
+    DWORD STDMETHODCALLTYPE GetLOD();
+
+    DWORD STDMETHODCALLTYPE GetLevelCount();
+
+    HRESULT STDMETHODCALLTYPE GetSurfaceLevel(UINT Level, d3d8::IDirect3DSurface8** ppSurfaceLevel);
+
+    HRESULT STDMETHODCALLTYPE LockRect(UINT Level, d3d8::D3DLOCKED_RECT* pLockedRect, CONST RECT* pRect, DWORD Flags);
+
+    HRESULT STDMETHODCALLTYPE UnlockRect(UINT Level);
+
+    HRESULT STDMETHODCALLTYPE AddDirtyRect(CONST RECT* pDirtyRect);
+
+    D3D9Texture2D* GetD3D9Iface() {
+      return m_d3d9;
+    }
+
+  private:
+
+    D3D9Texture2D* m_d3d9;
 
   };
-*/
 
-  // Implements IDirect3DCubeTexture8 //
-
-  using D3D8TextureCubeBase = D3D8BaseTexture<D3D8Surface, d3d9::IDirect3DCubeTexture9, IDirect3DCubeTexture8>;
-  class D3D8TextureCube final : public D3D8TextureCubeBase {
+  class D3D8TextureCube final : public d3d8::IDirect3DCubeTexture8 {
 
   public:
 
-    D3D8TextureCube(
-            D3D8DeviceEx*                       pDevice,
-            Com<d3d9::IDirect3DCubeTexture9>&&  pTexture)
-      : D3D8TextureCubeBase(pDevice, std::move(pTexture), D3DRTYPE_CUBETEXTURE) {
-    }
+    D3D8TextureCube(D3D9TextureCube* pParent)
+      : m_d3d9(pParent) { }
 
-    // TODO: IDirect3DCubeTexture8 QueryInterface
-    HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject) {
-      return D3D_OK;
-    }
+    HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject);
 
-    D3DRESOURCETYPE STDMETHODCALLTYPE GetType() { return D3DRTYPE_CUBETEXTURE; }
+    d3d8::D3DRESOURCETYPE STDMETHODCALLTYPE GetType();
 
-    HRESULT STDMETHODCALLTYPE GetLevelDesc(UINT Level, D3DSURFACE_DESC* pDesc) {
-      d3d9::D3DSURFACE_DESC surf;
-      HRESULT res = GetD3D9()->GetLevelDesc(Level, &surf);
-      ConvertSurfaceDesc8(&surf, pDesc);
-      return res;
-    }
+    ULONG STDMETHODCALLTYPE AddRef();
 
-    HRESULT STDMETHODCALLTYPE GetCubeMapSurface(D3DCUBEMAP_FACES Face, UINT Level, IDirect3DSurface8** ppSurfaceLevel) {
-      // TODO: cache this
-      Com<d3d9::IDirect3DSurface9> surface = nullptr;
-      HRESULT res = GetD3D9()->GetCubeMapSurface(d3d9::D3DCUBEMAP_FACES(Face), Level, &surface);
-      *ppSurfaceLevel = ref(new D3D8Surface(m_parent, std::move(surface)));
-      return res;
-    }
+    ULONG STDMETHODCALLTYPE Release();
+
+    HRESULT STDMETHODCALLTYPE GetPrivateData(
+            REFGUID     refguid,
+            void*       pData,
+            DWORD*      pSizeOfData);
+
+    HRESULT STDMETHODCALLTYPE SetPrivateData(
+            REFGUID     refguid,
+      const void*       pData,
+            DWORD       pSizeOfData,
+            DWORD       Flags);
+
+    HRESULT STDMETHODCALLTYPE FreePrivateData(REFGUID refguid);
+
+    HRESULT STDMETHODCALLTYPE GetDevice(d3d8::IDirect3DDevice8** ppDevice);
+
+    DWORD STDMETHODCALLTYPE GetPriority();
+
+    void STDMETHODCALLTYPE PreLoad();
+
+    DWORD STDMETHODCALLTYPE SetPriority(DWORD PriorityNew);
+
+    HRESULT STDMETHODCALLTYPE GetLevelDesc(UINT Level, d3d8::D3DSURFACE_DESC* pDesc);
+
+    DWORD STDMETHODCALLTYPE SetLOD(DWORD LodNew);
+
+    DWORD STDMETHODCALLTYPE GetLOD();
+
+    DWORD STDMETHODCALLTYPE GetLevelCount();
+
+    HRESULT STDMETHODCALLTYPE GetCubeMapSurface(d3d8::D3DCUBEMAP_FACES Face, UINT Level, d3d8::IDirect3DSurface8** ppSurfaceLevel);
 
     HRESULT STDMETHODCALLTYPE LockRect(
-            D3DCUBEMAP_FACES Face,
+            d3d8::D3DCUBEMAP_FACES Face,
             UINT Level,
-            D3DLOCKED_RECT* pLockedRect,
+            d3d8::D3DLOCKED_RECT* pLockedRect,
             const RECT* pRect,
-            DWORD Flags) {
-      return GetD3D9()->LockRect(
-        d3d9::D3DCUBEMAP_FACES(Face),
-        Level,
-        reinterpret_cast<d3d9::D3DLOCKED_RECT*>(pLockedRect),
-        pRect,
-        Flags);
+            DWORD Flags);
+
+    HRESULT STDMETHODCALLTYPE UnlockRect(d3d8::D3DCUBEMAP_FACES Face, UINT Level);
+
+    HRESULT STDMETHODCALLTYPE AddDirtyRect(d3d8::D3DCUBEMAP_FACES Face, const RECT* pDirtyRect);
+
+    D3D9TextureCube* GetD3D9Iface() {
+      return m_d3d9;
     }
 
-    HRESULT STDMETHODCALLTYPE UnlockRect(D3DCUBEMAP_FACES Face, UINT Level) {
-      return GetD3D9()->UnlockRect(d3d9::D3DCUBEMAP_FACES(Face), Level);
-    }
+  private:
 
-    HRESULT STDMETHODCALLTYPE AddDirtyRect(D3DCUBEMAP_FACES Face, const RECT* pDirtyRect) {
-      return GetD3D9()->AddDirtyRect(d3d9::D3DCUBEMAP_FACES(Face), pDirtyRect);
-    }
+    D3D9TextureCube* m_d3d9;
+
   };
+
+  class D3D8Texture3D final : public d3d8::IDirect3DVolumeTexture8 {
+
+  public:
+
+    D3D8Texture3D(D3D9Texture3D* pParent)
+      : m_d3d9(pParent) { }
+
+    HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject);
+
+    d3d8::D3DRESOURCETYPE STDMETHODCALLTYPE GetType();
+
+    ULONG STDMETHODCALLTYPE AddRef();
+
+    ULONG STDMETHODCALLTYPE Release();
+
+    HRESULT STDMETHODCALLTYPE GetPrivateData(
+            REFGUID     refguid,
+            void*       pData,
+            DWORD*      pSizeOfData);
+
+    HRESULT STDMETHODCALLTYPE SetPrivateData(
+            REFGUID     refguid,
+      const void*       pData,
+            DWORD       pSizeOfData,
+            DWORD       Flags);
+
+    HRESULT STDMETHODCALLTYPE FreePrivateData(REFGUID refguid);
+
+    HRESULT STDMETHODCALLTYPE GetDevice(d3d8::IDirect3DDevice8** ppDevice);
+
+    DWORD STDMETHODCALLTYPE GetPriority();
+
+    void STDMETHODCALLTYPE PreLoad();
+
+    DWORD STDMETHODCALLTYPE SetPriority(DWORD PriorityNew);
+
+    HRESULT STDMETHODCALLTYPE GetLevelDesc(UINT Level, d3d8::D3DVOLUME_DESC* pDesc);
+
+    DWORD STDMETHODCALLTYPE SetLOD(DWORD LodNew);
+
+    DWORD STDMETHODCALLTYPE GetLOD();
+
+    DWORD STDMETHODCALLTYPE GetLevelCount();
+
+    HRESULT STDMETHODCALLTYPE GetVolumeLevel(UINT Level, d3d8::IDirect3DVolume8** ppVolumeLevel);
+
+    HRESULT STDMETHODCALLTYPE LockBox(
+            UINT Level,
+            d3d8::D3DLOCKED_BOX* pLockedVolume,
+            const d3d8::D3DBOX* pBox,
+            DWORD Flags);
+
+    HRESULT STDMETHODCALLTYPE UnlockBox(UINT Level);
+
+    HRESULT STDMETHODCALLTYPE AddDirtyBox(const d3d8::D3DBOX* pDirtyBox);
+
+    D3D9Texture3D* GetD3D9Iface() {
+      return m_d3d9;
+    }
+
+  private:
+
+    D3D9Texture3D* m_d3d9;
+
+  };
+
 }

@@ -56,7 +56,9 @@ namespace dxvk {
     , m_csThread        ( dxvkDevice, dxvkDevice->createContext(DxvkContextType::Primary) )
     , m_csChunk         ( AllocCsChunk() )
     , m_d3d9Interop     ( this )
-    , m_bridge          ( this ) {
+    , m_bridge          ( this )
+    //, m_d3d8            ( this ) {
+      {
     // If we can SWVP, then we use an extended constant set
     // as SWVP has many more slots available than HWVP.
     bool canSWVP = CanSWVP();

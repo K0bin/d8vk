@@ -4,6 +4,8 @@
 
 #include "d3d9_common_texture.h"
 
+#include "../d3d8/d3d8_volume.h"
+
 namespace dxvk {
 
   using D3D9VolumeBase = D3D9Subresource<IDirect3DVolume9>;
@@ -33,6 +35,13 @@ namespace dxvk {
     HRESULT STDMETHODCALLTYPE LockBox(D3DLOCKED_BOX* pLockedBox, CONST D3DBOX* pBox, DWORD Flags) final;
 
     HRESULT STDMETHODCALLTYPE UnlockBox() final;
+
+    D3D8Volume* GetD3D8Iface() {
+      return &m_d3d8;
+    }
+
+  private:
+    D3D8Volume m_d3d8;
 
   };
 }

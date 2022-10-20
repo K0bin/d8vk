@@ -14,19 +14,19 @@ namespace dxvk {
   /**
   * \brief D3D8 interface implementation
   *
-  * Implements the IDirect3DDevice8 interfaces
-  * which provides the way to get adapters and create other objects such as \ref IDirect3DDevice8.
+  * Implements the d3d8::IDirect3DDevice8 interfaces
+  * which provides the way to get adapters and create other objects such as \ref d3d8::IDirect3DDevice8.
   * similar to \ref DxgiFactory but for D3D8.
   */
   class D3D8InterfaceEx final : public ComObjectClamp<IDirect3D8> {
 
-    static constexpr d3d9::D3DFORMAT ADAPTER_FORMATS[] = {
-      d3d9::D3DFMT_A1R5G5B5,
-      //d3d9::D3DFMT_A2R10G10B10, (not in D3D8)
-      d3d9::D3DFMT_A8R8G8B8,
-      d3d9::D3DFMT_R5G6B5,
-      d3d9::D3DFMT_X1R5G5B5,
-      d3d9::D3DFMT_X8R8G8B8
+    static constexpr D3DFORMAT ADAPTER_FORMATS[] = {
+      D3DFMT_A1R5G5B5,
+      //D3DFMT_A2R10G10B10, (not in D3D8)
+      D3DFMT_A8R8G8B8,
+      D3DFMT_R5G6B5,
+      D3DFMT_X1R5G5B5,
+      D3DFMT_X8R8G8B8
     };
 
   public:
@@ -62,7 +62,7 @@ namespace dxvk {
       D3DDISPLAYMODE* pMode);
 
     HRESULT STDMETHODCALLTYPE GetAdapterDisplayMode(UINT Adapter, D3DDISPLAYMODE* pMode) {
-      return m_d3d9ex->GetAdapterDisplayMode(Adapter, (d3d9::D3DDISPLAYMODE*)pMode);
+      return m_d3d9ex->GetAdapterDisplayMode(Adapter, (D3DDISPLAYMODE*)pMode);
     }
 
     HRESULT STDMETHODCALLTYPE CheckDeviceType(
@@ -73,9 +73,9 @@ namespace dxvk {
         BOOL        bWindowed) {
       return m_d3d9ex->CheckDeviceType(
           Adapter,
-          (d3d9::D3DDEVTYPE)DevType,
-          (d3d9::D3DFORMAT)AdapterFormat,
-          (d3d9::D3DFORMAT)BackBufferFormat,
+          (D3DDEVTYPE)DevType,
+          (D3DFORMAT)AdapterFormat,
+          (D3DFORMAT)BackBufferFormat,
           bWindowed
       );
     }
@@ -96,11 +96,11 @@ namespace dxvk {
 
       return m_d3d9ex->CheckDeviceFormat(
         Adapter,
-        (d3d9::D3DDEVTYPE)DeviceType,
-        (d3d9::D3DFORMAT)AdapterFormat,
+        (D3DDEVTYPE)DeviceType,
+        (D3DFORMAT)AdapterFormat,
         Usage,
-        (d3d9::D3DRESOURCETYPE)RType,
-        (d3d9::D3DFORMAT)CheckFormat
+        (D3DRESOURCETYPE)RType,
+        (D3DFORMAT)CheckFormat
       );
     }
 
@@ -114,10 +114,10 @@ namespace dxvk {
       DWORD* pQualityLevels = nullptr;
       return m_d3d9ex->CheckDeviceMultiSampleType(
         Adapter,
-        (d3d9::D3DDEVTYPE)DeviceType,
-        (d3d9::D3DFORMAT)SurfaceFormat,
+        (D3DDEVTYPE)DeviceType,
+        (D3DFORMAT)SurfaceFormat,
         Windowed,
-        (d3d9::D3DMULTISAMPLE_TYPE)MultiSampleType,
+        (D3DMULTISAMPLE_TYPE)MultiSampleType,
         pQualityLevels
       );
     }
@@ -130,10 +130,10 @@ namespace dxvk {
         D3DFORMAT DepthStencilFormat) {
       return m_d3d9ex->CheckDepthStencilMatch(
         Adapter,
-        (d3d9::D3DDEVTYPE)DeviceType,
-        (d3d9::D3DFORMAT)AdapterFormat,
-        (d3d9::D3DFORMAT)RenderTargetFormat,
-        (d3d9::D3DFORMAT)DepthStencilFormat
+        (D3DDEVTYPE)DeviceType,
+        (D3DFORMAT)AdapterFormat,
+        (D3DFORMAT)RenderTargetFormat,
+        (D3DFORMAT)DepthStencilFormat
       );
     }
 
@@ -141,8 +141,8 @@ namespace dxvk {
         UINT Adapter,
         D3DDEVTYPE DeviceType,
         D3DCAPS8* pCaps) {
-      d3d9::D3DCAPS9 caps9;
-      HRESULT res = m_d3d9ex->GetDeviceCaps(Adapter, (d3d9::D3DDEVTYPE)DeviceType, &caps9);
+      D3DCAPS9 caps9;
+      HRESULT res = m_d3d9ex->GetDeviceCaps(Adapter, (D3DDEVTYPE)DeviceType, &caps9);
       dxvk::ConvertCaps8(caps9, pCaps);
       return res;
     }
@@ -157,7 +157,7 @@ namespace dxvk {
         HWND hFocusWindow,
         DWORD BehaviorFlags,
         D3DPRESENT_PARAMETERS* pPresentationParameters,
-        IDirect3DDevice8** ppReturnedDeviceInterface);
+        d3d8::IDirect3DDevice8** ppReturnedDeviceInterface);
 
 
     //Rc<DxvkInstance> GetInstance() { return m_instance; }
@@ -166,13 +166,13 @@ namespace dxvk {
 
     UINT m_adapterCount;
     std::vector<UINT> m_adapterModeCounts;
-    std::vector<std::vector<d3d9::D3DDISPLAYMODE>> m_adapterModes;
+    std::vector<std::vector<D3DDISPLAYMODE>> m_adapterModes;
 
     //void CacheModes(D3D9Format Format);
 
     //static const char* GetDriverDllName(DxvkGpuVendor vendor);
 
-    d3d9::IDirect3D9Ex* m_d3d9ex;
+    IDirect3D9Ex* m_d3d9ex;
 
     bool m_extended;
 

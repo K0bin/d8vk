@@ -10,10 +10,11 @@ namespace dxvk {
     const D3D9_COMMON_TEXTURE_DESC* pDesc)
     : D3D9VolumeBase(
         pDevice,
-        new D3D9CommonTexture( pDevice, this, pDesc, D3DRTYPE_VOLUMETEXTURE, nullptr ),
+        new D3D9CommonTexture( pDevice, this, pDesc, D3DRTYPE_VOLUME, nullptr ),
         0, 0,
         nullptr,
-        nullptr) { }
+        nullptr)
+    , m_d3d8 ( this ) { }
 
 
   D3D9Volume::D3D9Volume(
@@ -27,7 +28,8 @@ namespace dxvk {
         pTexture,
         Face, MipLevel,
         pContainer,
-        pContainer) { }
+        pContainer)
+    , m_d3d8 ( this ) { }
 
 
   void D3D9Volume::AddRefPrivate() {

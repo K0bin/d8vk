@@ -38,6 +38,8 @@
 
 #include "../util/util_lru.h"
 
+//#include "../d3d8/d3d8_device.h"
+
 namespace dxvk {
 
   class D3D9InterfaceEx;
@@ -1327,6 +1329,8 @@ namespace dxvk {
     D3D9VkInteropDevice             m_d3d9Interop;
 
     D3D9Bridge                      m_bridge;
+
+    //D3D8Device                      m_d3d8;
   };
 
 }

@@ -1,85 +1,55 @@
 #pragma once
 
-
-// Implements IDirect3DSurface8
-
 #include "d3d8_include.h"
-#include "d3d8_device.h"
-#include "d3d8_resource.h"
-#include "d3d8_texture.h"
-#include "d3d8_d3d9_util.h"
-
-#include "../util/util_gdi.h"
-
-#include <algorithm>
 
 namespace dxvk {
+  class D3D9Surface;
 
-  struct D3D8_COMMON_TEXTURE_DESC;
-
-  using D3D8GDIDesc = D3DKMT_DESTROYDCFROMMEMORY;
-
-  // TODO: all inherited methods in D3D8Surface should be final like in d9vk
-
-  using D3D8SurfaceBase = D3D8Resource<d3d9::IDirect3DSurface9, IDirect3DSurface8>;
-  class D3D8Surface final : public D3D8SurfaceBase {
+  class D3D8Surface final : public d3d8::IDirect3DSurface8 {
 
   public:
 
-    D3D8Surface(
-            D3D8DeviceEx*                   pDevice,
-            Com<d3d9::IDirect3DSurface9>&&  pSurface)
-      : D3D8SurfaceBase (pDevice, std::move(pSurface)) {
-    }
+    D3D8Surface(D3D9Surface* pParent)
+      : m_d3d9(pParent) { }
 
-    D3D8Surface(
-            D3D8DeviceEx*                   pDevice,
-            Com<d3d9::IDirect3DSurface9>&&  pSurface,
-            UINT                            Face,
-            UINT                            MipLevel,
-            IDirect3DBaseTexture8*          pBaseTexture)
-      : D3D8SurfaceBase (pDevice, std::move(pSurface)) {
-    }
+    HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject);
+    ULONG STDMETHODCALLTYPE AddRef();
 
-    // TODO: Surface::QueryInterface
-    HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject) {
-      return D3D_OK;
-    }
+    ULONG STDMETHODCALLTYPE Release();
 
-    D3DRESOURCETYPE STDMETHODCALLTYPE GetType() {
-      return D3DRESOURCETYPE(GetD3D9()->GetType());
-    }
+    HRESULT STDMETHODCALLTYPE GetPrivateData(
+            REFGUID     refguid,
+            void*       pData,
+            DWORD*      pSizeOfData);
 
-    HRESULT STDMETHODCALLTYPE GetContainer(REFIID riid, void** ppContainer) {
-      return GetD3D9()->GetContainer(riid, ppContainer);
-    }
+    HRESULT STDMETHODCALLTYPE SetPrivateData(
+            REFGUID     refguid,
+      const void*       pData,
+            DWORD       pSizeOfData,
+            DWORD       Flags);
 
-    HRESULT STDMETHODCALLTYPE GetDesc(D3DSURFACE_DESC* pDesc) {
-      d3d9::D3DSURFACE_DESC desc;
-      HRESULT res = GetD3D9()->GetDesc(&desc);
-      ConvertSurfaceDesc8(&desc, pDesc);
-      return res;
-    }
+    HRESULT STDMETHODCALLTYPE FreePrivateData(REFGUID refguid);
 
-    HRESULT STDMETHODCALLTYPE LockRect(D3DLOCKED_RECT* pLockedRect, CONST RECT* pRect, DWORD Flags) {
-      return GetD3D9()->LockRect((d3d9::D3DLOCKED_RECT*)pLockedRect, pRect, Flags);
-    }
+    HRESULT STDMETHODCALLTYPE GetDevice(d3d8::IDirect3DDevice8** ppDevice);
 
-    HRESULT STDMETHODCALLTYPE UnlockRect() {
-      return GetD3D9()->UnlockRect();
-    }
+    HRESULT STDMETHODCALLTYPE GetDesc(d3d8::D3DSURFACE_DESC* pDesc);
 
-    HRESULT STDMETHODCALLTYPE GetDC(HDC* phDC) {
-      return GetD3D9()->GetDC(phDC);
-    }
+    HRESULT STDMETHODCALLTYPE GetContainer(REFIID riid, void** ppContainer);
 
-    HRESULT STDMETHODCALLTYPE ReleaseDC(HDC hDC) {
-      return GetD3D9()->ReleaseDC(hDC);
+    HRESULT STDMETHODCALLTYPE LockRect(
+            d3d8::D3DLOCKED_RECT* pLockedRect,
+            const RECT* pRect,
+            DWORD Flags);
+
+    HRESULT STDMETHODCALLTYPE UnlockRect();
+
+    D3D9Surface* GetD3D9Iface() {
+      return m_d3d9;
     }
 
   private:
 
-    D3D8GDIDesc m_dcDesc;
+    D3D9Surface* m_d3d9;
 
   };
 }

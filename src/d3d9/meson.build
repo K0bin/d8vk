@@ -9,6 +9,13 @@ d3d9_shaders = files([
   'shaders/d3d9_convert_yv12.comp'
 ])
 
+d3d8_src = [
+  '../d3d8/d3d8_texture.cpp',
+  '../d3d8/d3d8_surface.cpp',
+  '../d3d8/d3d8_volume.cpp'
+  # '../d3d8/d3d8_device.cpp',
+]
+
 d3d9_src = [
   'd3d9_main.cpp',
   'd3d9_interface.cpp',
@@ -47,7 +54,7 @@ d3d9_src = [
   'd3d9_bridge.cpp'
 ]
 
-d3d9_dll = shared_library('d3d9'+dll_ext, d3d9_src, glsl_generator.process(d3d9_shaders), d3d9_res,
+d3d9_dll = shared_library('d3d9'+dll_ext, d3d9_src + d3d8_src, glsl_generator.process(d3d9_shaders), d3d9_res,
   name_prefix         : '',
   dependencies        : [ dxso_dep, dxvk_dep ],
   include_directories : dxvk_include_path,

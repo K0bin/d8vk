@@ -5,6 +5,8 @@
 #include "d3d9_volume.h"
 #include "d3d9_util.h"
 
+#include "../d3d8/d3d8_texture.h"
+
 #include <vector>
 #include <list>
 #include <mutex>
@@ -148,6 +150,14 @@ namespace dxvk {
 
     HRESULT STDMETHODCALLTYPE AddDirtyRect(CONST RECT* pDirtyRect);
 
+    D3D8Texture2D* GetD3D8Iface() {
+      return &m_d3d8;
+    }
+
+  private:
+
+    D3D8Texture2D m_d3d8;
+
   };
 
   using D3D9Texture3DBase = D3D9BaseTexture<D3D9Volume, IDirect3DVolumeTexture9>;
@@ -173,6 +183,14 @@ namespace dxvk {
 
     HRESULT STDMETHODCALLTYPE AddDirtyBox(CONST D3DBOX* pDirtyBox);
 
+    D3D8Texture3D* GetD3D8Iface() {
+      return &m_d3d8;
+    }
+
+  private:
+
+    D3D8Texture3D m_d3d8;
+
   };
 
   using D3D9TextureCubeBase = D3D9BaseTexture<D3D9Surface, IDirect3DCubeTexture9>;
@@ -197,6 +215,14 @@ namespace dxvk {
     HRESULT STDMETHODCALLTYPE UnlockRect(D3DCUBEMAP_FACES Face, UINT Level);
 
     HRESULT STDMETHODCALLTYPE AddDirtyRect(D3DCUBEMAP_FACES Face, CONST RECT* pDirtyRect);
+
+    D3D8TextureCube* GetD3D8Iface() {
+      return &m_d3d8;
+    }
+
+  private:
+
+    D3D8TextureCube m_d3d8;
 
   };
 

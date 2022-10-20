@@ -10,7 +10,8 @@ namespace dxvk {
           D3D9DeviceEx*             pDevice,
     const D3D9_COMMON_TEXTURE_DESC* pDesc,
           HANDLE*                   pSharedHandle)
-    : D3D9Texture2DBase( pDevice, pDesc, D3DRTYPE_TEXTURE, pSharedHandle ) { }
+    : D3D9Texture2DBase( pDevice, pDesc, D3DRTYPE_TEXTURE, pSharedHandle )
+    , m_d3d8           ( this ) { }
 
 
   HRESULT STDMETHODCALLTYPE D3D9Texture2D::QueryInterface(REFIID riid, void** ppvObject) {
@@ -106,7 +107,8 @@ namespace dxvk {
   D3D9Texture3D::D3D9Texture3D(
           D3D9DeviceEx*             pDevice,
     const D3D9_COMMON_TEXTURE_DESC* pDesc)
-    : D3D9Texture3DBase( pDevice, pDesc, D3DRTYPE_VOLUMETEXTURE, nullptr ) { }
+    : D3D9Texture3DBase( pDevice, pDesc, D3DRTYPE_VOLUMETEXTURE, nullptr )
+    , m_d3d8           ( this ) { }
 
 
   HRESULT STDMETHODCALLTYPE D3D9Texture3D::QueryInterface(REFIID riid, void** ppvObject) {
@@ -196,7 +198,8 @@ namespace dxvk {
   D3D9TextureCube::D3D9TextureCube(
           D3D9DeviceEx*             pDevice,
     const D3D9_COMMON_TEXTURE_DESC* pDesc)
-    : D3D9TextureCubeBase( pDevice, pDesc, D3DRTYPE_CUBETEXTURE, nullptr ) { }
+    : D3D9TextureCubeBase( pDevice, pDesc, D3DRTYPE_CUBETEXTURE, nullptr )
+    , m_d3d8             ( this ) { }
 
 
   HRESULT STDMETHODCALLTYPE D3D9TextureCube::QueryInterface(REFIID riid, void** ppvObject) {

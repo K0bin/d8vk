@@ -1,46 +1,60 @@
 #pragma once
 
-#include "d3d8_resource.h"
+#include "d3d8_include.h"
 #include "d3d8_d3d9_util.h"
 
 namespace dxvk {
-  
-  using D3D8VolumeBase = D3D8Resource<d3d9::IDirect3DVolume9, IDirect3DVolume8>;
-  class D3D8Volume final : public D3D8VolumeBase {
+
+class D3D9Volume;
+
+class D3D8Volume final : public d3d8::IDirect3DVolume8 {
 
   public:
 
-    D3D8Volume(
-      D3D8DeviceEx* pDevice,
-      Com<d3d9::IDirect3DVolume9>&& pVolume);
+    D3D8Volume(D3D9Volume* pParent)
+      : m_d3d9(pParent) { }
 
-    // TODO: QueryInterface
-    HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject) {
-      return D3D_OK;
+    HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** ppvObject);
+
+    d3d8::D3DRESOURCETYPE STDMETHODCALLTYPE GetType();
+
+    ULONG STDMETHODCALLTYPE AddRef();
+
+    ULONG STDMETHODCALLTYPE Release();
+
+    HRESULT STDMETHODCALLTYPE GetPrivateData(
+            REFGUID     refguid,
+            void*       pData,
+            DWORD*      pSizeOfData);
+
+    HRESULT STDMETHODCALLTYPE SetPrivateData(
+            REFGUID     refguid,
+      const void*       pData,
+            DWORD       pSizeOfData,
+            DWORD       Flags);
+
+    HRESULT STDMETHODCALLTYPE FreePrivateData(REFGUID refguid);
+
+    HRESULT STDMETHODCALLTYPE GetDevice(d3d8::IDirect3DDevice8** ppDevice);
+
+    HRESULT STDMETHODCALLTYPE GetDesc(d3d8::D3DVOLUME_DESC* pDesc);
+
+    HRESULT STDMETHODCALLTYPE LockBox(
+            d3d8::D3DLOCKED_BOX* pLockedVolume,
+            const d3d8::D3DBOX* pBox,
+            DWORD Flags);
+
+    HRESULT STDMETHODCALLTYPE UnlockBox();
+
+    HRESULT STDMETHODCALLTYPE GetContainer(REFIID riid, void** ppContainer);
+
+    D3D9Volume* GetD3D9Iface() {
+      return m_d3d9;
     }
 
-    HRESULT STDMETHODCALLTYPE GetContainer(REFIID riid, void** ppContainer) {
-      return GetD3D9()->GetContainer(riid, ppContainer);
-    }
+  private:
 
-    HRESULT STDMETHODCALLTYPE GetDesc(D3DVOLUME_DESC* pDesc) {
-      d3d9::D3DVOLUME_DESC desc;
-      HRESULT res = GetD3D9()->GetDesc(&desc);
-      ConvertVolumeDesc8(&desc, pDesc);
-      return res;
-    }
-
-    HRESULT STDMETHODCALLTYPE LockBox(D3DLOCKED_BOX* pLockedBox, CONST D3DBOX* pBox, DWORD Flags) final {
-      return GetD3D9()->LockBox(
-        reinterpret_cast<d3d9::D3DLOCKED_BOX*>(pLockedBox),
-        reinterpret_cast<const d3d9::D3DBOX*>(pBox),
-        Flags
-      );
-    }
-
-    HRESULT STDMETHODCALLTYPE UnlockBox() final {
-      return GetD3D9()->UnlockBox();
-    }
+    D3D9Volume* m_d3d9;
 
   };
 

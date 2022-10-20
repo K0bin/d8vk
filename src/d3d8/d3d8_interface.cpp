@@ -9,7 +9,7 @@ namespace dxvk
 {
   D3D8InterfaceEx::D3D8InterfaceEx(UINT SDKVersion)
   {
-    d3d9::Direct3DCreate9Ex(D3D_SDK_VERSION, &m_d3d9ex);
+    Direct3DCreate9Ex(D3D_SDK_VERSION, &m_d3d9ex);
 
     m_bridge = GetD3D9Bridge<D3D9InterfaceBridge>(m_d3d9ex);
     m_d3d8Options = m_bridge->GetConfig();
@@ -24,7 +24,7 @@ namespace dxvk
       m_adapterModes.emplace_back();
 
       // cache adapter modes and mode counts for each d3d9 format
-      for (d3d9::D3DFORMAT fmt : ADAPTER_FORMATS) {
+      for (D3DFORMAT fmt : ADAPTER_FORMATS) {
 
         const UINT modeCount = m_d3d9ex->GetAdapterModeCount(adapter, fmt);
 
@@ -70,7 +70,7 @@ namespace dxvk
     else
       Flags |= D3DENUM_WHQL_LEVEL;
 
-    d3d9::D3DADAPTER_IDENTIFIER9 identifier9;
+    D3DADAPTER_IDENTIFIER9 identifier9;
     HRESULT res = m_d3d9ex->GetAdapterIdentifier(Adapter, Flags, &identifier9);
 
     strncpy(pIdentifier->Driver, identifier9.Driver, MAX_DEVICE_IDENTIFIER_STRING);
@@ -112,19 +112,19 @@ namespace dxvk
         HWND hFocusWindow,
         DWORD BehaviorFlags,
         D3DPRESENT_PARAMETERS* pPresentationParameters,
-        IDirect3DDevice8** ppReturnedDeviceInterface) {
+        d3d8::IDirect3DDevice8** ppReturnedDeviceInterface) {
 
-    Com<d3d9::IDirect3DDevice9> pDevice9 = nullptr;
-    d3d9::D3DPRESENT_PARAMETERS params = ConvertPresentParameters9(pPresentationParameters);
+    Com<IDirect3DDevice9> pDevice9 = nullptr;
+    D3DPRESENT_PARAMETERS params = ConvertPresentParameters9(pPresentationParameters);
 
     // HACK: forceD16
     if (m_d3d8Options.forceD16 && params.EnableAutoDepthStencil) {
-      params.AutoDepthStencilFormat = d3d9::D3DFMT_D16;
+      params.AutoDepthStencilFormat = D3DFMT_D16;
     }
 
     HRESULT res = m_d3d9ex->CreateDevice(
       Adapter,
-      (d3d9::D3DDEVTYPE)DeviceType,
+      (D3DDEVTYPE)DeviceType,
       hFocusWindow,
       BehaviorFlags,
       &params,
@@ -135,7 +135,7 @@ namespace dxvk
       return res;
     }
 
-    *ppReturnedDeviceInterface = ref(new D3D8DeviceEx(this, std::move(pDevice9), DeviceType, hFocusWindow, BehaviorFlags));
+    *ppReturnedDeviceInterface = ref(new D3D8Device(this, std::move(pDevice9), DeviceType, hFocusWindow, BehaviorFlags));
 
     return res;
   }

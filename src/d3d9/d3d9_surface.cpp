@@ -18,7 +18,8 @@ namespace dxvk {
         new D3D9CommonTexture( pDevice, this, pDesc, D3DRTYPE_SURFACE, pSharedHandle),
         0, 0,
         nullptr,
-        pContainer) { }
+        pContainer)
+    , m_d3d8 ( this ) { }
 
   D3D9Surface::D3D9Surface(
           D3D9DeviceEx*             pDevice,
@@ -31,7 +32,8 @@ namespace dxvk {
         pTexture,
         Face, MipLevel,
         pBaseTexture,
-        pBaseTexture) { }
+        pBaseTexture)
+    , m_d3d8 ( this ) { }
 
   void D3D9Surface::AddRefPrivate() {
     if (m_baseTexture != nullptr) {

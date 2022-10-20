@@ -4,6 +4,8 @@
 
 #include "d3d9_common_texture.h"
 
+#include "../d3d8/d3d8_surface.h"
+
 #include "../util/util_gdi.h"
 
 #include <algorithm>
@@ -59,9 +61,15 @@ namespace dxvk {
 
     void ClearContainer();
 
+    D3D8Surface* GetD3D8Iface() {
+      return &m_d3d8;
+    }
+
   private:
 
     D3D9GDIDesc m_dcDesc;
+
+    D3D8Surface m_d3d8;
 
   };
 }
