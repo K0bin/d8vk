@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../d3d9/d3d9_bridge.h"
 #include "../util/config/config.h"
 
 namespace dxvk {

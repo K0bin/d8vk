@@ -4,6 +4,7 @@ d3d8_src = [
   'd3d8_main.cpp',
   'd3d8_interface.cpp',
   'd3d8_device.cpp',
+  'd3d8_buffer.cpp',
   'd3d8_texture.cpp',
   'd3d8_surface.cpp',
   'd3d8_volume.cpp',

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "d3d9_adapter.h"
-#include "d3d9_bridge.h"
 #include "d3d9_interop.h"
 
 #include "../dxvk/dxvk_instance.h"
@@ -144,8 +143,6 @@ namespace dxvk {
     static const char* GetDriverDllName(DxvkGpuVendor vendor);
 
     Rc<DxvkInstance>              m_instance;
-
-    D3D9InterfaceBridge           m_bridge;
 
     bool                          m_extended;
 

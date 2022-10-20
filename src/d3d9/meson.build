@@ -14,8 +14,8 @@ d3d8_src = [
   '../d3d8/d3d8_surface.cpp',
   '../d3d8/d3d8_volume.cpp',
   '../d3d8/d3d8_buffer.cpp',
-  '../d3d8/d3d8_interface.cpp'
-  # '../d3d8/d3d8_device.cpp',
+  '../d3d8/d3d8_interface.cpp',
+  '../d3d8/d3d8_device.cpp'
 ]
 
 d3d9_src = [
@@ -53,7 +53,6 @@ d3d9_src = [
   'd3d9_mem.cpp',
   'd3d9_window.cpp',
   'd3d9_interop.cpp',
-  'd3d9_bridge.cpp'
 ]
 
 d3d9_dll = shared_library('d3d9'+dll_ext, d3d9_src + d3d8_src, glsl_generator.process(d3d9_shaders), d3d9_res,

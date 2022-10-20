@@ -16,14 +16,15 @@ namespace dxvk {
     if (!ppDirect3D8)
       return D3DERR_INVALIDCALL;
 
-    *ppDirect3D8 = ref(new D3D8Interface(SDKVersion));
+    D3D9InterfaceEx* d3d9Iface = ref(new D3D9InterfaceEx( Extended ));
+    *ppDirect3D8 = d3d9Iface->GetD3D8Iface();
+
     return D3D_OK;
   }
 }
 
 extern "C" {
 
-  
   DLLEXPORT IDirect3D8* __stdcall Direct3DCreate8(UINT nSDKVersion) {
     //dxvk::CreateD3D9(false, &pDirect3D);
 

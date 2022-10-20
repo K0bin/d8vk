@@ -5,11 +5,8 @@
 #include "d3d8_include.h"
 #include "d3d8_texture.h"
 #include "d3d8_buffer.h"
-#include "d3d8_state_block.h"
 #include "d3d8_d3d9_util.h"
 #include "d3d8_caps.h"
-
-#include "../d3d9/d3d9_bridge.h"
 
 #include <array>
 #include <vector>
@@ -42,6 +39,7 @@ namespace dxvk {
   class D3D8Interface;
   class D3D8SwapChainEx;
   class D3D9DeviceEx;
+  class D3D9StateBlock;
 
   struct D3D8VertexShaderInfo;
 
@@ -51,13 +49,7 @@ namespace dxvk {
     friend class D3D8StateBlock;
   public:
 
-    D3D8Device(
-      D3D8Interface*              pParent,
-      Com<IDirect3DDevice9>&& pDevice,
-      //D3D8Adapter*                    pAdapter,
-      D3DDEVTYPE                    DeviceType,
-      HWND                          hFocusWindow,
-      DWORD                         BehaviorFlags);
+    D3D8Device(D3D9DeviceEx* pParent);
 
     ~D3D8Device();
 
@@ -387,17 +379,9 @@ namespace dxvk {
 
   public: // Internal Methods //
 
-    inline bool ShouldRecord() { return m_d3d9->ShouldRecord() }
-
     D3D9DeviceEx* GetD3D9Iface() { return m_d3d9; }
 
   private:
-
-    D3D9Bridge*           m_bridge;
-
-    D3D9DeviceEx*         m_d3d9;
-
-    Com<D3D8Interface>  m_parent;
 
     std::array<d3d8::IDirect3DBaseTexture8*, d8caps::MAX_TEXTURE_STAGES>  m_textures;
 
@@ -410,6 +394,8 @@ namespace dxvk {
     DWORD                       m_currentPixelShader   = 0;  // will have DXVK_D3D8_SHADER_BIT
 
     std::unordered_map<DWORD, Com<D3D9StateBlock>> m_stateBlocks;
+
+    D3D9DeviceEx*         m_d3d9;
 
   };
 
