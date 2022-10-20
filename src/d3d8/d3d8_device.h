@@ -387,7 +387,7 @@ namespace dxvk {
 
   public: // Internal Methods //
 
-    inline bool ShouldRecord() { return m_recorder != nullptr; }
+    inline bool ShouldRecord() { return m_d3d9->ShouldRecord() }
 
     D3D9DeviceEx* GetD3D9Iface() { return m_d3d9; }
 
@@ -399,8 +399,6 @@ namespace dxvk {
 
     Com<D3D8InterfaceEx>  m_parent;
 
-    D3D8StateBlock* m_recorder = nullptr;
-
     std::array<d3d8::IDirect3DBaseTexture8*, d8caps::MAX_TEXTURE_STAGES>  m_textures;
 
     Com<D3D8IndexBuffer>        m_indices;
@@ -410,6 +408,8 @@ namespace dxvk {
     std::vector<IDirect3DPixelShader9*>   m_pixelShaders;
     DWORD                       m_currentVertexShader  = 0;  // can be FVF or vs index, can have DXVK_D3D8_SHADER_BIT
     DWORD                       m_currentPixelShader   = 0;  // will have DXVK_D3D8_SHADER_BIT
+
+    std::unordered_map<DWORD, Com<D3D9StateBlock>> m_stateBlocks;
 
   };
 

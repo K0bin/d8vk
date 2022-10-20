@@ -489,42 +489,46 @@ namespace dxvk {
           D3DSTATEBLOCKTYPE     Type,
           DWORD*                pToken) {
 
-    Com<IDirect3DStateBlock9> pStateBlock9;
+    /*Com<IDirect3DStateBlock9> pStateBlock9;
     HRESULT res = m_d3d9->CreateStateBlock(D3DSTATEBLOCKTYPE(Type), &pStateBlock9);
 
     D3D8StateBlock* pStateBlock = new D3D8StateBlock(this, pStateBlock9.ref());
 
-    *pToken = DWORD(reinterpret_cast<uintptr_t>(pStateBlock));
+    *pToken = DWORD(reinterpret_cast<uintptr_t>(pStateBlock));*/
 
-    return res;
+    return S_FALSE;
   }
 
   HRESULT STDMETHODCALLTYPE D3D8Device::CaptureStateBlock(DWORD Token) {
-    return reinterpret_cast<D3D8StateBlock*>(Token)->Capture();
+    //return reinterpret_cast<D3D8StateBlock*>(Token)->Capture();
+    return S_FALSE;
   }
 
   HRESULT STDMETHODCALLTYPE D3D8Device::ApplyStateBlock(DWORD Token) {
-    return reinterpret_cast<D3D8StateBlock*>(Token)->Apply();
+    //return reinterpret_cast<D3D8StateBlock*>(Token)->Apply();
+    return S_FALSE;
   }
 
   HRESULT STDMETHODCALLTYPE D3D8Device::DeleteStateBlock(DWORD Token) {
-    delete reinterpret_cast<D3D8StateBlock*>(Token);
-    return D3D_OK;
+    //delete reinterpret_cast<D3D8StateBlock*>(Token);
+    //return D3D_OK;
+    return S_FALSE;
   }
 
   HRESULT STDMETHODCALLTYPE D3D8Device::BeginStateBlock() {
 
-    if (unlikely(m_recorder != nullptr))
+    /*if (unlikely(m_recorder != nullptr))
       return D3DERR_INVALIDCALL;
 
     m_recorder = new D3D8StateBlock(this);
 
-    return m_d3d9->BeginStateBlock();
+    return m_d3d9->BeginStateBlock();*/
+    return S_FALSE;
   }
 
   HRESULT STDMETHODCALLTYPE D3D8Device::EndStateBlock(DWORD* pToken) {
 
-    if (unlikely(pToken == nullptr || m_recorder == nullptr))
+    /*if (unlikely(pToken == nullptr || m_recorder == nullptr))
       return D3DERR_INVALIDCALL;
 
     Com<IDirect3DStateBlock9> pStateBlock;
@@ -536,7 +540,8 @@ namespace dxvk {
 
     m_recorder = nullptr;
 
-    return res;
+    return res;*/
+    return S_FALSE;
   }
 
   HRESULT STDMETHODCALLTYPE D3D8Device::SetClipStatus(const D3DCLIPSTATUS8* pClipStatus) {
@@ -1012,7 +1017,7 @@ namespace dxvk {
     }
 
     // Check for extra bit that indicates this is not an FVF
-    if ( (Handle & DXVK_D3D8_SHADER_BIT ) != 0 ) {
+    if ( (Handle &   ) != 0 ) {
       // Remove that bit
       Handle &= ~DXVK_D3D8_SHADER_BIT;
 
