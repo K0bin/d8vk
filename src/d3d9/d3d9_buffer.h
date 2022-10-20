@@ -4,6 +4,8 @@
 
 #include "d3d9_common_buffer.h"
 
+#include "../d3d8/d3d8_buffer.h"
+
 namespace dxvk {
 
   template <typename... Type>
@@ -67,6 +69,14 @@ namespace dxvk {
 
     HRESULT STDMETHODCALLTYPE GetDesc(D3DVERTEXBUFFER_DESC* pDesc);
 
+    D3D8VertexBuffer* GetD3D8Iface() {
+      return &m_d3d8;
+    }
+
+  private:
+
+    D3D8VertexBuffer m_d3d8;
+
   };
 
   using D3D9IndexBufferBase = D3D9Buffer<IDirect3DIndexBuffer9>;
@@ -85,6 +95,14 @@ namespace dxvk {
     D3DRESOURCETYPE STDMETHODCALLTYPE GetType();
 
     HRESULT STDMETHODCALLTYPE GetDesc(D3DINDEXBUFFER_DESC* pDesc);
+
+    D3D8IndexBuffer* GetD3D8Iface() {
+      return &m_d3d8;
+    }
+
+  private:
+
+    D3D8IndexBuffer m_d3d8;
 
   };
 

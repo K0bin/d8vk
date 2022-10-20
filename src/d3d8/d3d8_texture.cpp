@@ -53,7 +53,7 @@ namespace dxvk {
   }
 
   void STDMETHODCALLTYPE D3D8Texture2D::PreLoad() {
-    return m_d3d9->PreLoad();
+    m_d3d9->PreLoad();
   }
 
   DWORD STDMETHODCALLTYPE D3D8Texture2D::SetPriority(DWORD PriorityNew) {
@@ -154,7 +154,7 @@ namespace dxvk {
   }
 
   void STDMETHODCALLTYPE D3D8TextureCube::PreLoad() {
-    return m_d3d9->PreLoad();
+    m_d3d9->PreLoad();
   }
 
   DWORD STDMETHODCALLTYPE D3D8TextureCube::SetPriority(DWORD PriorityNew) {
@@ -246,7 +246,7 @@ namespace dxvk {
     if (res != D3D_OK) {
       return res;
     }
-    //*ppSurfaceLevel = static_cast<D3D9Device*>(d3d9Device)->GetD3D8Iface();
+    //*ppDevice = static_cast<D3D9Device*>(d3d9Device)->GetD3D8Iface();
     return D3D_OK;
   }
 
@@ -255,7 +255,7 @@ namespace dxvk {
   }
 
   void STDMETHODCALLTYPE D3D8Texture3D::PreLoad() {
-    return m_d3d9->PreLoad();
+    m_d3d9->PreLoad();
   }
 
   DWORD STDMETHODCALLTYPE D3D8Texture3D::SetPriority(DWORD PriorityNew) {
