@@ -198,6 +198,11 @@ namespace dxvk {
       return S_OK;
     }
 
+    /*if (riid == __uuidof(d3d8::IDirect3DDevice8)) {
+      *ppvObject = ref(GetD3D8Iface());
+      return S_OK;
+    }*/
+
     // We want to ignore this if the extended device is queried and we weren't made extended.
     if (riid == __uuidof(IDirect3DDevice9Ex))
       return E_NOINTERFACE;

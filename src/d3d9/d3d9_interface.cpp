@@ -83,6 +83,11 @@ namespace dxvk {
       return S_OK;
     }
 
+    if (riid == __uuidof(d3d8::IDirect3D8)) {
+      *ppvObject = ref(GetD3D8Iface());
+      return S_OK;
+    }
+
     Logger::warn("D3D9InterfaceEx::QueryInterface: Unknown interface query");
     Logger::warn(str::format(riid));
     return E_NOINTERFACE;
