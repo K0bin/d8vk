@@ -7,6 +7,7 @@
 #include "../d3d9/d3d9_surface.h"
 #include "../d3d9/d3d9_buffer.h"
 #include "../d3d9/d3d9_stateblock.h"
+#include "../d3d9/d3d9_interface.h"
 
 #ifdef MSC_VER
 #pragma fenv_access (on)
@@ -679,9 +680,9 @@ namespace dxvk {
           UINT                    StreamNumber,
           d3d8::IDirect3DVertexBuffer8* pStreamData,
           UINT                    Stride) {
-    D3D8VertexBuffer* buffer = static_cast<D3D8VertexBuffer*>(pStreamData);
+    D3D9VertexBuffer* buffer = pStreamData ? static_cast<D3D8VertexBuffer*>(pStreamData)->GetD3D9Iface() : nullptr;
 
-    return m_d3d9->SetStreamSource(StreamNumber, buffer->GetD3D9Iface(), 0, Stride);
+    return m_d3d9->SetStreamSource(StreamNumber, buffer, 0, Stride);
   }
 
   HRESULT STDMETHODCALLTYPE D3D8Device::SetIndices(d3d8::IDirect3DIndexBuffer8* pIndexData, UINT BaseVertexIndex) {
@@ -690,20 +691,25 @@ namespace dxvk {
 
     // used by DrawIndexedPrimitive
     m_baseVertexIndex = static_cast<INT>(BaseVertexIndex);
+    D3D9IndexBuffer* buffer = pIndexData ? static_cast<D3D8IndexBuffer*>(pIndexData)->GetD3D9Iface() : nullptr;
 
-    D3D8IndexBuffer* buffer = static_cast<D3D8IndexBuffer*>(pIndexData);
-
-    m_indices = buffer;
-
-    return m_d3d9->SetIndices(buffer->GetD3D9Iface());
+    return m_d3d9->SetIndices(buffer);
   }
 
   HRESULT STDMETHODCALLTYPE D3D8Device::GetIndices(
           d3d8::IDirect3DIndexBuffer8** ppIndexData,
           UINT* pBaseVertexIndex) {
-    *ppIndexData      = m_indices.ptr();
+    InitReturnPtr(ppIndexData);
+
+    if (unlikely(ppIndexData == nullptr))
+      return D3DERR_INVALIDCALL;
+
+    IDirect3DIndexBuffer9* d3d9Buffer = nullptr;
+    HRESULT res = m_d3d9->GetIndices(&d3d9Buffer);
+
+    *ppIndexData      = d3d9Buffer ? static_cast<D3D9IndexBuffer*>(d3d9Buffer)->GetD3D8Iface() : nullptr;
     *pBaseVertexIndex = m_baseVertexIndex;
-    return D3D_OK;
+    return res;
   }
 
     HRESULT STDMETHODCALLTYPE D3D8Device::SetPixelShaderConstant(
@@ -835,7 +841,7 @@ namespace dxvk {
     if (res != D3D_OK)
       return res;
 
-    //*ppD3D8 = static_cast<D3D9InterfaceEx*>(static_cast<IDirect3D9Ex*>(d3d9Iface))->GetD3D8Iface();
+    *ppD3D8 = static_cast<D3D9InterfaceEx*>(static_cast<IDirect3D9Ex*>(d3d9Iface))->GetD3D8Iface();
 
     return D3D_OK;
   }

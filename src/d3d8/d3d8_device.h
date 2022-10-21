@@ -385,7 +385,6 @@ namespace dxvk {
 
     std::array<d3d8::IDirect3DBaseTexture8*, d8caps::MAX_TEXTURE_STAGES>  m_textures;
 
-    Com<D3D8IndexBuffer>        m_indices;
     INT                         m_baseVertexIndex = 0;
 
     std::vector<D3D8VertexShaderInfo>           m_vertexShaders;

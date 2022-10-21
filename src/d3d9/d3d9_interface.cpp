@@ -87,6 +87,7 @@ namespace dxvk {
       *ppvObject = ref(GetD3D8Iface());
       return S_OK;
     }
+    Logger::warn("D3D9InterfaceEx::QdfsafdasfsdueryInterface: Unknown interface query");
 
     Logger::warn("D3D9InterfaceEx::QueryInterface: Unknown interface query");
     Logger::warn(str::format(riid));

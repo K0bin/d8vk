@@ -3,6 +3,7 @@
 #include "d3d8_texture.h"
 
 #include "../d3d9/d3d9_interface.h"
+#include "../d3d9/d3d9_device.h"
 
 #include <cstring>
 
@@ -218,7 +219,7 @@ namespace dxvk
         d3d8::D3DPRESENT_PARAMETERS* pPresentationParameters,
         d3d8::IDirect3DDevice8** ppReturnedDeviceInterface) {
 
-    Com<IDirect3DDevice9> pDevice9 = nullptr;
+    IDirect3DDevice9* pDevice9 = nullptr;
     D3DPRESENT_PARAMETERS params = ConvertPresentParameters9(pPresentationParameters);
 
     // HACK: forceD16
@@ -239,7 +240,7 @@ namespace dxvk
       return res;
     }
 
-    //*ppReturnedDeviceInterface = ref(new D3D8Device(this, std::move(pDevice9), DeviceType, hFocusWindow, BehaviorFlags));
+    *ppReturnedDeviceInterface = static_cast<D3D9DeviceEx*>(pDevice9)->GetD3D8Iface();
 
     return res;
   }

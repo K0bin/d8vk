@@ -1,6 +1,9 @@
 #include "d3d8_texture.h"
 
 #include "../d3d9/d3d9_texture.h"
+#include "../d3d9/d3d9_surface.h"
+#include "../d3d9/d3d9_volume.h"
+#include "../d3d9/d3d9_device.h"
 #include "d3d8_d3d9_util.h"
 
 namespace dxvk {
@@ -44,7 +47,7 @@ namespace dxvk {
     if (res != D3D_OK) {
       return res;
     }
-    //*ppDevice = static_cast<D3D9Device*>(d3d9Device)->GetD3D8Iface();
+    *ppDevice = static_cast<D3D9DeviceEx*>(d3d9Device)->GetD3D8Iface();
     return D3D_OK;
   }
 
@@ -89,7 +92,7 @@ namespace dxvk {
     if (res != D3D_OK) {
       return res;
     }
-    //*ppSurfaceLevel = static_cast<D3D9Surface*>(d3d9Surface)->GetD3D8Iface();
+    *ppSurfaceLevel = static_cast<D3D9Surface*>(d3d9Surface)->GetD3D8Iface();
     return D3D_OK;
   }
 
@@ -145,7 +148,7 @@ namespace dxvk {
     if (res != D3D_OK) {
       return res;
     }
-    //*ppSurfaceLevel = static_cast<D3D9Device*>(d3d9Device)->GetD3D8Iface();
+    *ppDevice = static_cast<D3D9DeviceEx*>(d3d9Device)->GetD3D8Iface();
     return D3D_OK;
   }
 
@@ -190,7 +193,7 @@ namespace dxvk {
     if (res != D3D_OK) {
       return res;
     }
-    //*ppSurfaceLevel = static_cast<D3D9Surface*>(d3d9Surface)->GetD3D8Iface();
+    *ppSurfaceLevel = static_cast<D3D9Surface*>(d3d9Surface)->GetD3D8Iface();
     return D3D_OK;
   }
 
@@ -246,7 +249,7 @@ namespace dxvk {
     if (res != D3D_OK) {
       return res;
     }
-    //*ppDevice = static_cast<D3D9Device*>(d3d9Device)->GetD3D8Iface();
+    *ppDevice = static_cast<D3D9DeviceEx*>(d3d9Device)->GetD3D8Iface();
     return D3D_OK;
   }
 
@@ -292,7 +295,7 @@ namespace dxvk {
     if (res != D3D_OK) {
       return res;
     }
-    //*ppSurfaceLevel = static_cast<D3D9Surface*>(d3d9Surface)->GetD3D8Iface();
+    *ppVolumeLevel = static_cast<D3D9Volume*>(d3d9Volume)->GetD3D8Iface();
     return D3D_OK;
   }
 
