@@ -28,6 +28,11 @@ namespace dxvk {
       return S_OK;
     }
 
+    if (riid == __uuidof(d3d8::IDirect3DTexture8)) {
+      *ppvObject = ref(GetD3D8Iface());
+      return S_OK;
+    }
+
     if (riid == __uuidof(ID3D9VkInteropTexture)) {
       *ppvObject = ref(m_texture.GetVkInterop());
       return S_OK;
@@ -125,6 +130,11 @@ namespace dxvk {
       return S_OK;
     }
 
+    if (riid == __uuidof(d3d8::IDirect3DVolumeTexture8)) {
+      *ppvObject = ref(GetD3D8Iface());
+      return S_OK;
+    }
+
     if (riid == __uuidof(ID3D9VkInteropTexture)) {
       *ppvObject = ref(m_texture.GetVkInterop());
       return S_OK;
@@ -213,6 +223,11 @@ namespace dxvk {
      || riid == __uuidof(IDirect3DBaseTexture9)
      || riid == __uuidof(IDirect3DCubeTexture9)) {
       *ppvObject = ref(this);
+      return S_OK;
+    }
+
+    if (riid == __uuidof(d3d8::IDirect3DCubeTexture8)) {
+      *ppvObject = ref(GetD3D8Iface());
       return S_OK;
     }
 

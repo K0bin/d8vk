@@ -1,6 +1,7 @@
 #include "d3d8_buffer.h"
 
 #include "../d3d9/d3d9_buffer.h"
+#include "../d3d9/d3d9_device.h"
 
 namespace dxvk {
 
@@ -9,7 +10,7 @@ namespace dxvk {
   HRESULT STDMETHODCALLTYPE D3D8VertexBuffer::QueryInterface(
             REFIID  riid,
             void** ppvObject) {
-    return S_FALSE;
+    return m_d3d9->QueryInterface(riid, ppvObject);
   }
 
   ULONG STDMETHODCALLTYPE D3D8VertexBuffer::AddRef() {
@@ -45,7 +46,7 @@ namespace dxvk {
     if (res != D3D_OK) {
       return res;
     }
-    //*ppDevice = static_cast<D3D9Device*>(d3d9Device)->GetD3D8Iface();
+    *ppDevice = static_cast<D3D9DeviceEx*>(d3d9Device)->GetD3D8Iface();
     return D3D_OK;
   }
 
@@ -87,7 +88,7 @@ namespace dxvk {
   HRESULT STDMETHODCALLTYPE D3D8IndexBuffer::QueryInterface(
             REFIID  riid,
             void** ppvObject) {
-    return S_FALSE;
+    return m_d3d9->QueryInterface(riid, ppvObject);
   }
 
   ULONG STDMETHODCALLTYPE D3D8IndexBuffer::AddRef() {
@@ -123,7 +124,7 @@ namespace dxvk {
     if (res != D3D_OK) {
       return res;
     }
-    //*ppDevice = static_cast<D3D9Device*>(d3d9Device)->GetD3D8Iface();
+    *ppDevice = static_cast<D3D9DeviceEx*>(d3d9Device)->GetD3D8Iface();
     return D3D_OK;
   }
 

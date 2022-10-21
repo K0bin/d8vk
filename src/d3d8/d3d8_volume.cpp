@@ -1,6 +1,7 @@
 #include "d3d8_volume.h"
 
 #include "../d3d9/d3d9_volume.h"
+#include "../d3d9/d3d9_device.h"
 
 namespace dxvk {
 
@@ -46,7 +47,7 @@ namespace dxvk {
     if (res != D3D_OK) {
       return res;
     }
-    //*ppDevice = static_cast<D3D9Device*>(d3d9Device)->GetD3D8Iface();
+    *ppDevice = static_cast<D3D9DeviceEx*>(d3d9Device)->GetD3D8Iface();
     return D3D_OK;
   }
 

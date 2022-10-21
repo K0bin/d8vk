@@ -41,20 +41,7 @@ namespace dxvk
   }
 
   HRESULT STDMETHODCALLTYPE D3D8Interface::QueryInterface(REFIID riid, void** ppvObject) {
-    if (ppvObject == nullptr)
-      return E_POINTER;
-
-    *ppvObject = nullptr;
-
-    if (riid == __uuidof(IUnknown)) {
-      //|| riid == __uuidof(IDirect3D8)) {
-      *ppvObject = ref(this);
-      return S_OK;
-    }
-
-    Logger::warn("D3D8Interface::QueryInterface: Unknown interface query");
-    Logger::warn(str::format(riid));
-    return E_NOINTERFACE;
+    return m_d3d9->QueryInterface(riid, ppvObject);
   }
 
   ULONG STDMETHODCALLTYPE D3D8Interface::AddRef() {

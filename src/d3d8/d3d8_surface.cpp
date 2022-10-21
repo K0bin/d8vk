@@ -1,6 +1,7 @@
 #include "d3d8_surface.h"
 
 #include "../d3d9/d3d9_surface.h"
+#include "../d3d9/d3d9_device.h"
 #include "d3d8_d3d9_util.h"
 
 namespace dxvk {
@@ -42,7 +43,7 @@ namespace dxvk {
     if (res != D3D_OK) {
       return res;
     }
-    //*ppSurfaceLevel = static_cast<D3D9Device*>(d3d9Device)->GetD3D8Iface();
+    *ppDevice = static_cast<D3D9DeviceEx*>(d3d9Device)->GetD3D8Iface();
     return D3D_OK;
   }
 

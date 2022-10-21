@@ -31,10 +31,10 @@ namespace dxvk {
     }
 
 
-    /*if (riid == __uuidof(d3d8::IDirect3DVertexBuffer8)) {
+    if (riid == __uuidof(d3d8::IDirect3DVertexBuffer8)) {
       *ppvObject = ref(GetD3D8Iface());
       return S_OK;
-    }*/
+    }
 
     Logger::warn("D3D9VertexBuffer::QueryInterface: Unknown interface query");
     Logger::warn(str::format(riid));
@@ -94,10 +94,10 @@ namespace dxvk {
       return S_OK;
     }
 
-    /*if (riid == __uuidof(d3d8::IDirect3DIndexBuffer8)) {
+    if (riid == __uuidof(d3d8::IDirect3DIndexBuffer8)) {
       *ppvObject = ref(GetD3D8Iface());
       return S_OK;
-    }*/
+    }
 
     Logger::warn("D3D9IndexBuffer::QueryInterface: Unknown interface query");
     Logger::warn(str::format(riid));
